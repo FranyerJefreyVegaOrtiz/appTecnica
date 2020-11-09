@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppTecnica">
         <activity android:name=".Equipo" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".Inicio">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

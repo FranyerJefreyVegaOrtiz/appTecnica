@@ -3,12 +3,11 @@ package com.example.apptecnica;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.media.audiofx.DynamicsProcessing;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity {
+public class Inicio extends AppCompatActivity {
 
     Button btnCEquipo, btnVerificacion;
 
@@ -22,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void CrearEquipo (View view){
-        Intent crearEquipo = new Intent(MainActivity.this, Equipo.class);
+        Intent crearEquipo = new Intent(Inicio.this, Equipo.class);
         startActivity(crearEquipo);
     }
 }

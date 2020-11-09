@@ -17,8 +17,13 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,8 +32,10 @@ public class Equipo extends AppCompatActivity {
 
 
     //dbEquipo.ConexionSQliteHelper con;
-    Button btnRegistrar;
+    Button btnRegistrar, btnBuscarEquipo;
     EditText etNombreEquipo, etCodigo, etMegger, etTierra;
+
+    RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +48,14 @@ public class Equipo extends AppCompatActivity {
         etMegger = (EditText)findViewById(R.id.etMegger);
         etTierra = (EditText)findViewById(R.id.etTierra);
         btnRegistrar = (Button)findViewById(R.id.btnRegistrar);
+        btnBuscarEquipo = (Button)findViewById(R.id.btnBuscarEquipo);
 
+        btnBuscarEquipo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                buscarEquipo("https://apptecnica.000webhostapp.com/crud/BuscarEquipo.php?codigo="+etCodigo.getText()+"");
+            }
+        });
         btnRegistrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,8 +107,35 @@ public class Equipo extends AppCompatActivity {
                     return params;
                 }
             };
-            RequestQueue requestQueue = Volley.newRequestQueue(Equipo.this);
+            requestQueue = Volley.newRequestQueue(Equipo.this);
             requestQueue.add(request);
         }
+    }
+    private void buscarEquipo(String URL){
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(URL, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                JSONObject jsonObject = null;
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        jsonObject = response.getJSONObject(i);
+                        etNombreEquipo.setText(jsonObject.getString("nombre"));
+                        etCodigo.setText(jsonObject.getString("codigo"));
+                        etMegger.setText(jsonObject.getString("megger"));
+                        etTierra.setText(jsonObject.getString("tierra"));
+                    } catch (JSONException e) {
+                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),"ERROR DE CONEXION",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        requestQueue=Volley.newRequestQueue(this);
+        requestQueue.add(jsonArrayRequest);
     }
 }
