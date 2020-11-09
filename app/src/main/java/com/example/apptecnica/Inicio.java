@@ -24,4 +24,9 @@ public class Inicio extends AppCompatActivity {
         Intent crearEquipo = new Intent(Inicio.this, Equipo.class);
         startActivity(crearEquipo);
     }
+
+    public void Verificacion (View view){
+        Intent verificacion = new Intent(Inicio.this, Verificacion.class);
+        startActivity(verificacion);
+    }
 }
