@@ -2,6 +2,7 @@ package com.example.apptecnica;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -40,66 +41,60 @@ public class Equipo extends AppCompatActivity {
         etMegger = (EditText)findViewById(R.id.etMegger);
         etTierra = (EditText)findViewById(R.id.etTierra);
         btnRegistrar = (Button)findViewById(R.id.btnRegistrar);
-    }
 
-
-    public void Registrar (View view){
-        ejecutarServicio("http://192.168.56.1/apptecnica/equipo");
-    }
-
-    private void ejecutarServicio (String URL){
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+        btnRegistrar.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onResponse(String response) {
-                Toast.makeText(getApplicationContext(), "OPERACION EXITOSA", Toast.LENGTH_SHORT).show();
+            public void onClick(View v) {
+                Conexion();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(),error.toString(),Toast.LENGTH_SHORT).show();
-            }
-        }){
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> parametros = new HashMap<String, String>();
-                parametros.put("Nombre", etNombreEquipo.getText().toString());
-                parametros.put("Codigo", etCodigo.getText().toString());
-                parametros.put("Megger", etMegger.getText().toString());
-                parametros.put("Tierra", etTierra.getText().toString());
-                return parametros;
-            }
-        };
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(stringRequest);
+        });
     }
 
+    private void Conexion(){
+        String nombre = etNombreEquipo.getText().toString().trim();
+        String codigo = etCodigo.getText().toString().trim();
+        String megger = etMegger.getText().toString().trim();
+        String tierra = etTierra.getText().toString().trim();
 
-
-
-    /*public void CrearEquipo (View view){
-        Intent crearEquipo = new Intent(MainActivity.this, Equipo.class);
-        startActivity(crearEquipo);
-    }*/
-
-   /* public void onClick(View view){
-        RegistrarEquipo();
-        Toast.makeText(getApplicationContext(), "El Equipo Se Ha Registrado", Toast.LENGTH_SHORT).show();
-
-
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        if (nombre.isEmpty()){
+            etNombreEquipo.setError("Complete los campos");
+        }
+        else if (codigo.isEmpty()){
+            etCodigo.setError("Complete los campos");
+        }
+        else{
+            progressDialog.show();
+            StringRequest request = new StringRequest(Request.Method.POST, "https://apptecnica.000webhostapp.com/crud/Conexion.php", new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    if (response.equalsIgnoreCase("Datos almacenados")) {
+                        Toast.makeText(Equipo.this, "Datos Almacenados", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                    } else {
+                        Toast.makeText(Equipo.this, response, Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(Equipo.this,error.getMessage(),Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                }
+            }){
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> params =new HashMap<String, String>();
+                    params.put("nombre", nombre);
+                    params.put("codigo", codigo);
+                    params.put("megger", megger);
+                    params.put("tierra", tierra);
+                    return params;
+                }
+            };
+            RequestQueue requestQueue = Volley.newRequestQueue(Equipo.this);
+            requestQueue.add(request);
+        }
     }
-
-    private void RegistrarEquipo(){
-        dbEquipo.ConexionSQliteHelper conn = new dbEquipo.ConexionSQliteHelper(this, "bd_Equipo", null, 1);
-        SQLiteDatabase db = conn.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(dbEquipo.NombreEquipo, NombreEquipo.getText().toString());
-        values.put(dbEquipo.Codigo, Codigo.getText().toString());
-        values.put(dbEquipo.Meger, Meger.getText().toString());
-        values.put(dbEquipo.Tierra, Tierra.getText().toString());
-
-        long idResultado = db.insert(dbEquipo.Tabla_Equipo,dbEquipo.idEquipo,values);
-        Toast.makeText(getApplicationContext(), "Id Registrado" +idResultado, Toast.LENGTH_SHORT).show();
-        db.close();
-    }*/
 }
